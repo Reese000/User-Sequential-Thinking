@@ -1,0 +1,47 @@
+﻿{
+  "title": "Sequential Thinking MCP Tool Contract",
+  "tool": "sequentialthinking",
+  "tool_name": "sequentialthinking",
+  "inputSchema": {
+    "thought": {
+      "type": "string",
+      "required": true,
+      "description": "Current analysis step or reasoning message"
+    },
+    "nextThoughtNeeded": {
+      "type": "boolean",
+      "required": true,
+      "description": "Whether another thought is needed"
+    },
+    "thoughtNumber": {
+      "type": "integer",
+      "required": true,
+      "description": "Current thought index (1+)",
+      "minimum": 1
+    },
+    "totalThoughts": {
+      "type": "integer",
+      "required": true,
+      "description": "Estimated total thoughts",
+      "minimum": 1
+    },
+    "isRevision": { "type": "boolean", "required": false },
+    "revisesThought": { "type": "integer", "minimum": 1, "required": false },
+    "branchFromThought": { "type": "integer", "minimum": 1, "required": false },
+    "branchId": { "type": "string", "required": false },
+    "needsMoreThoughts": { "type": "boolean", "required": false }
+  },
+  "outputSchema": {
+    "thoughtNumber": "integer",
+    "totalThoughts": "integer",
+    "nextThoughtNeeded": "boolean",
+    "branches": ["string"],
+    "thoughtHistoryLength": "integer"
+  },
+  "example": {
+    "thought": "Initialize and confirm the branch flow",
+    "nextThoughtNeeded": false,
+    "thoughtNumber": 1,
+    "totalThoughts": 1
+  }
+}

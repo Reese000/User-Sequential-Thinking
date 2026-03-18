@@ -1,0 +1,55 @@
+﻿# Usage
+
+## Minimal Health Check
+
+1. Confirm server process can start:
+
+```powershell
+& 'C:/Progra~1/nodejs/node.exe' 'C:/mcp-tools/server-sequential-thinking/dist/index.js'
+```
+
+Expected: process prints `Sequential Thinking MCP Server running on stdio`.
+
+2. Confirm MCP host tool availability with your environment call and current active identifier.
+
+```text
+server: user-user-sequential-thinking
+tool: sequentialthinking
+```
+
+## Example MCP call payload
+
+```json
+{
+  "thought": "Validate startup path and tool availability.",
+  "nextThoughtNeeded": false,
+  "thoughtNumber": 1,
+  "totalThoughts": 1
+}
+```
+
+## Expected structured response (shape)
+
+```json
+{
+  "thoughtNumber": 1,
+  "totalThoughts": 1,
+  "nextThoughtNeeded": false,
+  "branches": [],
+  "thoughtHistoryLength": 1
+}
+```
+
+## Branching/Revision Use Cases
+
+- `isRevision: true` with `revisesThought` to revise prior reasoning
+- `branchFromThought` + `branchId` for divergent paths
+- Keep `nextThoughtNeeded` true until the reasoning chain is complete
+
+## Operational Guidance
+
+- Keep logs/stderr clean; avoid noisy stdout in production if wrapping with external supervisors
+- If call fails, verify:
+  - MCP config still points to valid local path
+  - Cache folder exists and is not stale
+  - Server identifier used in calls matches current registry
