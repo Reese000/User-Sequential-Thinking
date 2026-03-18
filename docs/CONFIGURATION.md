@@ -10,7 +10,9 @@
       "args": [
         "C:/mcp-tools/server-sequential-thinking/dist/index.js"
       ],
-      "env": {}
+      "env": {
+        "DISABLE_THOUGHT_LOGGING": "true"
+      }
     },
     "critic": {
       "command": "node",
@@ -22,6 +24,16 @@
   }
 }
 ```
+
+### Scope precedence
+
+Cursor reads MCP JSON from multiple scopes, and behavior is based on effective merged config in the current process:
+
+- `~/.cursor/mcp.json`
+- `Desktop/Cursor/.cursor/mcp.json`
+- `%APPDATA%/Cursor/User/globalStorage/mcp.json`
+
+Run `pwsh .\scripts\maintain-sequential-thinking.ps1 -Mode check` to print a status summary for all scopes in the environment.
 
 ## MCP Cache Folder Snapshot (this environment)
 

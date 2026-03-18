@@ -4,12 +4,13 @@ A local, fully documented MCP integration for the Model Context Protocol `sequen
 
 ## Purpose
 
-This repository documents the locally hosted Sequential Thinking MCP setup used in your current Cursor environment, including:
+This repository documents and supports the locally hosted Sequential Thinking MCP setup used in your current Cursor environment, including:
 
 - Standard install and verification checklist
+- Deterministic probe and repair scripts
 - MCP configuration templates for user-level and workspace-level setups
 - Tool schema and usage examples
-- Registry/cache behavior and why the active server identifier can differ from the server name
+- Registry/cache behavior and why the active server identifier can differ from the package name
 - Troubleshooting guidance for "no tools/prompts/resources" startup failures
 
 ## Server in Use
@@ -20,7 +21,7 @@ This repository documents the locally hosted Sequential Thinking MCP setup used 
 - Registered MCP tool: `sequentialthinking`
 - MCP identifier observed in this environment: `user-user-sequential-thinking`
 
-## Contents
+## Repository Contents
 
 - [Architecture](./docs/ARCHITECTURE.md)
 - [Installation](./docs/INSTALLATION.md)
@@ -28,12 +29,42 @@ This repository documents the locally hosted Sequential Thinking MCP setup used 
 - [Usage](./docs/USAGE.md)
 - [Troubleshooting](./docs/TROUBLESHOOTING.md)
 - [Change Log](./docs/CHANGELOG.md)
+- [Maintenance Scripts](./scripts)
+
+## New Operational Scripts
+
+- `scripts/maintain-sequential-thinking.ps1`:
+  - `-Mode check` (default): validates config files, cache paths, and discovery candidates.
+  - `-Mode repair`: updates config/cache entries and regenerates cache descriptors.
+- `scripts/mcp-probe.mjs`:
+  - Runs a protocol-level MCP initialize + tools/list probe to prove the tool registry includes `sequentialthinking`.
+
+### Quick check (read-only)
+
+```powershell
+cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
+powershell .\scripts\maintain-sequential-thinking.ps1 -Mode check
+```
+
+### Apply repair actions
+
+```powershell
+cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
+powershell .\scripts\maintain-sequential-thinking.ps1 -Mode repair
+```
+
+### Direct probe validation
+
+```powershell
+cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
+node .\scripts\mcp-probe.mjs 'C:/mcp-tools/server-sequential-thinking/dist/index.js' 'C:/Progra~1/nodejs/node.exe' 12000
+```
 
 ## Health Check Summary
 
 - MCP server starts successfully using local stdio transport
-- Tool registration returns 1 tool under the active server identifier (`user-user-sequential-thinking`)
-- A valid call returns structured output containing `thoughtHistoryLength`, `branches`, and final thought state
+- Tool registration can return the `sequentialthinking` tool without adding new MCP tools
+- A valid call returns structured output with `thoughtHistoryLength`, `branches`, and final thought state
 
 ## Repository Convention (Critic-style Formatting)
 
@@ -51,3 +82,4 @@ This repo captures runtime-local integration details only; the upstream npm pack
 ## License
 
 MIT-0 style permissive documentation intent for internal/Team use.
+

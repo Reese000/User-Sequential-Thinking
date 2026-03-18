@@ -9,16 +9,32 @@
 - Config exists in one Cursor scope but host is reading another file
 - `node` path or entrypoint path malformed due spaces
 
-### Fix sequence
+### Repair-first sequence
 
-1. Validate config in all relevant scopes:
+1. Validate config paths and cache status:
+
+```powershell
+cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
+powershell .\scripts\maintain-sequential-thinking.ps1 -Mode check
+```
+
+2. If check reports inconsistencies, apply repair:
+
+```powershell
+powershell .\scripts\maintain-sequential-thinking.ps1 -Mode repair
+```
+
+3. Restart Cursor fully (close all windows) and retry host-level actions.
+4. Run the direct probe after repair:
+
+```powershell
+node .\scripts\mcp-probe.mjs 'C:/mcp-tools/server-sequential-thinking/dist/index.js' 'C:/Progra~1/nodejs/node.exe' 12000
+```
+
+5. If still unresolved, review config scope precedence:
    - `~/.cursor/mcp.json`
    - `Desktop/Cursor/.cursor/mcp.json`
    - `%APPDATA%/Cursor/User/globalStorage/mcp.json`
-2. Confirm active identifier by attempting call against currently known IDs.
-3. Ensure cache entries are valid and reload host after edits:
-   - `~/.cursor/projects/<workspace>/mcps/user-user-sequential-thinking/`
-4. Restart Cursor fully (close all windows) and retry.
 
 ## Log locations
 
@@ -33,13 +49,15 @@
 ## Recovery checklist
 
 - Delete stale server cache folder only if config was changed extensively
-- Recreate schema in cache folder
-- Reload Cursor and re-run a two-step MCP probe call
+- Recreate schema in cache folder using `-Mode repair`
+- Confirm probe output shows `status: "ok"` and `hasSequentialThinking: true`
 
-## Verification Command Template
+## Expected probe result
 
-```powershell
-node -e "console.log('manual verify placeholder')"
+```json
+{
+  "status": "ok",
+  "hasSequentialThinking": true
+}
 ```
 
-Use this with your host-level preferred probe script.
