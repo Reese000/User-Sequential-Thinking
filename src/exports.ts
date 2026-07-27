@@ -7,9 +7,10 @@ export { SequentialThinkingSession } from './thinking/session.js';
 export type { ThoughtData, ThoughtResult, McpResponse, SessionOptions } from './thinking/session.js';
 
 // Agents
-export { AgentSkills, findMatchingSkills, getSkillByName, buildSkillPrompt } from './agents/skills.js';
+export { AGENT_SKILLS, findMatchingSkills, getSkillByName, buildSkillPrompt } from './agents/skills.js';
 export { HumanRelayAgent } from './agents/human-relay.js';
-export type { Skill, RelayQuestion, RelayResponse } from './agents/skills.js';
+export type { Skill } from './agents/skills.js';
+export type { RelayQuestion, RelayResponse } from './agents/human-relay.js';
 
 // Skills registry
 export { SkillsRegistry } from './skills/skills-registry.js';

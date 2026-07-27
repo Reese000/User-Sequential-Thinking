@@ -128,7 +128,7 @@ describe('formatting utilities', () => {
     it('should truncate long strings with ellipsis', () => {
       const result = truncate('this is a very long string', 10);
       expect(result).toHaveLength(10);
-      expect(result).toEndWith('...');
+      expect(result.endsWith('...')).toBe(true);
     });
 
     it('should handle exact length', () => {

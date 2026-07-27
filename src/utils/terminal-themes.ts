@@ -5,14 +5,14 @@ import chalk from 'chalk';
 /** A terminal color theme */
 export interface TerminalTheme {
   name: string;
-  thought: chalk.Chalk;
-  revision: chalk.Chalk;
-  branch: chalk.Chalk;
-  error: chalk.Chalk;
-  success: chalk.Chalk;
-  info: chalk.Chalk;
-  border: chalk.Chalk;
-  muted: chalk.Chalk;
+  thought: typeof chalk;
+  revision: typeof chalk;
+  branch: typeof chalk;
+  error: typeof chalk;
+  success: typeof chalk;
+  info: typeof chalk;
+  border: typeof chalk;
+  muted: typeof chalk;
 }
 
 /** Default theme using standard chalk colors */

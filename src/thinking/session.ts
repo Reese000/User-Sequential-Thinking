@@ -26,7 +26,7 @@ export interface ThoughtResult {
 
 /** MCP content response format */
 export interface McpResponse {
-  content: Array<{ type: string; text: string }>;
+  content: Array<{ type: 'text'; text: string }>;
   isError?: boolean;
 }
 

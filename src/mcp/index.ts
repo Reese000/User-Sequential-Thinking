@@ -5,8 +5,9 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  type CallToolResult,
 } from '@modelcontextprotocol/sdk/types.js';
-import { SequentialThinkingSession, type McpResponse } from '../thinking/session.js';
+import { SequentialThinkingSession } from '../thinking/session.js';
 import { SEQUENTIAL_THINKING_TOOL, type ServerConfig, DEFAULT_CONFIG } from '../utils/config-schema.js';
 
 /**
@@ -49,19 +50,20 @@ export class McpServerWrapper {
       tools: [SEQUENTIAL_THINKING_TOOL],
     }));
 
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request, extra) => {
       if (request.params.name === 'sequentialthinking') {
-        return this.session.processThought(
+        const result = this.session.processThought(
           request.params.arguments as Record<string, unknown>,
         );
+        return {
+          content: result.content,
+          isError: result.isError,
+        } satisfies CallToolResult;
       }
       return {
-        content: [{
-          type: 'text' as const,
-          text: `Unknown tool: ${request.params.name}`,
-        }],
+        content: [{ type: 'text' as const, text: `Unknown tool: ${request.params.name}` }],
         isError: true,
-      };
+      } satisfies CallToolResult;
     });
   }
 
