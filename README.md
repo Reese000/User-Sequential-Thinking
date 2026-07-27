@@ -1,85 +1,127 @@
-﻿# User-Sequential-Thinking MCP
+﻿# User-Sequential-Thinking
 
-A local, fully documented MCP integration for the Model Context Protocol `sequentialthinking` tool.
+A local MCP (Model Context Protocol) integration for the `sequentialthinking` tool. Wraps the upstream `@modelcontextprotocol/server-sequential-thinking` with session management, agent skills, and terminal UI.
 
 ## Purpose
 
-This repository documents and supports the locally hosted Sequential Thinking MCP setup used in your current Cursor environment, including:
+This MCP server provides a structured, reflective problem-solving tool for AI agents. It implements the sequential thinking protocol with:
 
-- Standard install and verification checklist
-- Deterministic probe and repair scripts
-- MCP configuration templates for user-level and workspace-level setups
-- Tool schema and usage examples
-- Registry/cache behavior and why the active server identifier can differ from the package name
-- Troubleshooting guidance for "no tools/prompts/resources" startup failures
+- **Session management** — Thought history, branching, export/import
+- **Agent skills** — Pre-built skill prompts (code review, debug, design, research, test) that guide the thinking process
+- **Human relay** — Handoff points for human judgment when the thinking process reaches ambiguity
+- **Terminal UI** — Interactive CLI, markdown rendering, spinner, ASCII art, formatting utilities
+- **MCP transport** — Stdio-based MCP server compatible with any MCP host (Claude Desktop, etc.)
 
-## Server in Use
+## Tech Stack
 
-- Upstream package: `@modelcontextprotocol/server-sequential-thinking`
-- Runtime command: `C:/Progra~1/nodejs/node.exe`
-- Entrypoint used in examples: `C:/mcp-tools/server-sequential-thinking/dist/index.js`
-- Registered MCP tool: `sequentialthinking`
-- MCP identifier observed in this environment: `user-user-sequential-thinking`
+| Layer | Technology |
+|-------|-----------|
+| Runtime | Node.js ≥20 |
+| Language | TypeScript (ES2022, ESM, NodeNext) |
+| MCP SDK | `@modelcontextprotocol/sdk` ^1.27.1 |
+| CLI | `yargs` ^17.7.2, `chalk` ^5.3.0 |
+| Testing | Vitest ^3.0.0 |
+| Format | ESM-only (`"type": "module"`) |
 
-## Repository Contents
+## Architecture
 
-- [Architecture](./docs/ARCHITECTURE.md)
-- [Installation](./docs/INSTALLATION.md)
-- [Configuration](./docs/CONFIGURATION.md)
-- [Usage](./docs/USAGE.md)
-- [Troubleshooting](./docs/TROUBLESHOOTING.md)
-- [Change Log](./docs/CHANGELOG.md)
-- [Maintenance Scripts](./scripts)
-
-## New Operational Scripts
-
-- `scripts/maintain-sequential-thinking.ps1`:
-  - `-Mode check` (default): validates config files, cache paths, and discovery candidates.
-  - `-Mode repair`: updates config/cache entries and regenerates cache descriptors.
-- `scripts/mcp-probe.mjs`:
-  - Runs a protocol-level MCP initialize + tools/list probe to prove the tool registry includes `sequentialthinking`.
-
-### Quick check (read-only)
-
-```powershell
-cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
-powershell .\scripts\maintain-sequential-thinking.ps1 -Mode check
+```
+src/
+├── index.ts              — Entry point, public API exports
+├── exports.ts            — Barrel exports
+├── agents/
+│   ├── skills.ts         — Pre-built skill prompts + matcher
+│   └── human-relay.ts    — Human handoff agent
+├── mcp/
+│   └── index.ts          — MCP server wrapper (stdio transport)
+├── skills/
+│   └── skills-registry.ts — Runtime skill registry
+├── thinking/
+│   └── session.ts        — Core thought session management
+├── ui/
+│   ├── cli.ts            — Interactive CLI
+│   ├── ui.ts             — Base UI
+│   ├── formatting.ts     — Number/string/table formatting
+│   ├── spinner.ts        — Terminal spinner
+│   ├── markdown-renderer.ts — Terminal markdown rendering
+│   └── ascii-art.ts      — ASCII art/logo/section headers
+└── utils/
+    ├── config-schema.ts   — Server config, tool definition, CLI args
+    ├── json-protocol.ts   — JSON-RPC protocol helpers
+    ├── terminal-themes.ts — Color themes (default, dark, minimal)
+    └── defaults.ts        — Default values
 ```
 
-### Apply repair actions
+## Setup
 
-```powershell
-cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
-powershell .\scripts\maintain-sequential-thinking.ps1 -Mode repair
+```bash
+npm install
 ```
 
-### Direct probe validation
+## Usage
 
-```powershell
-cd 'C:/Users/Reese Chang/Desktop/AI/User-Sequential-Thinking'
-node .\scripts\mcp-probe.mjs 'C:/mcp-tools/server-sequential-thinking/dist/index.js' 'C:/Progra~1/nodejs/node.exe' 12000
+### As an MCP server (stdio transport)
+
+```bash
+npm run build
+npm start        # Starts the MCP server on stdio
 ```
 
-## Health Check Summary
+Configure in your MCP host (e.g., Claude Desktop `mcp_servers.json`):
 
-- MCP server starts successfully using local stdio transport
-- Tool registration can return the `sequentialthinking` tool without adding new MCP tools
-- A valid call returns structured output with `thoughtHistoryLength`, `branches`, and final thought state
+```json
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "node",
+      "args": ["path/to/user-sequential-thinking/dist/index.js"]
+    }
+  }
+}
+```
 
-## Repository Convention (Critic-style Formatting)
+### Interactive CLI
 
-Use a strict status-first response format when updating this repo or submitting changes:
+```typescript
+import { SequentialThinkingSession, CliInterface } from 'user-sequential-thinking';
 
-- `[STATUS]` = current outcome (`DONE`, `BLOCKED`, etc.)
-- `[VIOLATIONS]` = issues discovered
-- `[CRITIQUE]` = explanation of what is/was wrong
-- `[REQUIRED ACTION]` = corrective steps
+const session = new SequentialThinkingSession();
+const cli = new CliInterface(session);
+cli.start();
+```
 
-## Citation Context
+### As a library
 
-This repo captures runtime-local integration details only; the upstream npm package remains unchanged.
+```typescript
+import { SequentialThinkingSession } from 'user-sequential-thinking';
+
+const session = new SequentialThinkingSession();
+const result = session.processThought({
+  thought: 'Analyzing the problem...',
+  thoughtNumber: 1,
+  totalThoughts: 5,
+  nextThoughtNeeded: true,
+});
+console.log(result);
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run build` | Compile TypeScript → `dist/` |
+| `npm test` | Run Vitest test suite |
+| `npm run test:watch` | Watch mode tests |
+| `npm run test:coverage` | Tests with coverage report |
+| `npm run lint` | TypeScript type check (no emit) |
+| `npm start` | Run compiled MCP server |
+
+## Status
+
+**Functional.** Core session management (thought validation, history, branching, export/import) is complete and tested. The MCP server wrapper runs on stdio. The interactive CLI supports all core commands (`/history`, `/branches`, `/export`, `/reset`, `/quit`). Agent skills registry and human relay agent are implemented with full test coverage.
+
+Tests pass: ~33 test cases across session management, agent skills, human relay, markdown renderer, spinner, formatting utilities, terminal themes, and CLI.
 
 ## License
 
-MIT-0 style permissive documentation intent for internal/Team use.
-
+MIT
