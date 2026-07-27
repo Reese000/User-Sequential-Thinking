@@ -3,3 +3,13 @@ Thumbs.db
 *.swp
 *.swo
 *~
+node_modules/
+dist/
+*.tsbuildinfo
+coverage/
+.vitest/
+.env
+.env.local
+.env.development
+.env.production
+*.log
